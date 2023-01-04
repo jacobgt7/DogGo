@@ -77,7 +77,7 @@ namespace DogGo.Controllers
         // POST: OwnersController/Edit/5
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public ActionResult Edit(int id, Owner owner)
+        public ActionResult Edit(Owner owner)
         {
             try
             {
