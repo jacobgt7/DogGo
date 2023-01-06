@@ -1,42 +1,65 @@
-﻿@model DogGo.Models.Walker
+﻿@model DogGo.Models.ViewModels.WalkerProfileViewModel
 
 @{
     ViewData["Title"] = "Details";
 }
 
-<h1>Details</h1>
+<h1>
+    Walker Profile
+</h1>
 
 <div>
-    <h4>Walker</h4>
     <hr />
-    <dl class="row">
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.Id)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.Id)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.Name)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.Name)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.Neighborhood)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.Neighborhood.Name)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.ImageUrl)
-        </dt>
-        <dd class = "col-sm-10">
-            <img class="bg-info" src="@Model.ImageUrl" alt="avatar" />
-        </dd>
-    </dl>
+    <section class="container">
+        <img style="width:100px;float:left;margin-right:20px"
+            src="@Model.Walker.ImageUrl"/>
+        <div>
+            <label class="font-weight-bold">Name:</label>
+            <span>@Model.Walker.Name</span>
+        </div>
+        <div>
+            <label class="font-weight-bold">Neighborhood:</label>
+            <span>@Model.Walker.Neighborhood.Name</span>
+        </div>
+        <div>
+            @Html.ActionLink("Edit", "Edit", new {  id = Model.Walker.Id  }) |
+            <a asp-action="Index">Back to List</a>
+        </div>
+    </section>
+
+    <hr class="mt-5" />
+    <div class="clearfix"></div>
+
+    <div class="row">
+        <section class="col-8 container mt-5">
+            <h1>Recent Walks</h1>
+
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th scope="col">Date</th>
+                        <th scope="col">Client</th>
+                        <th scope="col">Duration</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (Walk walk in Model.RecentWalks)
+                    {
+                        <tr>
+                            <td>@walk.Date.ToString("MM/dd/yyyy")</td>
+                            <td>@walk.ClientName</td>
+                            <td>@(walk.Duration / 60) min</td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </section>
+
+        <section class="col-8 container mt-5">
+            <h2>@Model.TotalWalkTime </h2>
+        </section>
+    </div>
+
 </div>
-<div>z
-    @Html.ActionLink("Edit", "Edit", new {  id = Model.Id  }) |
-    <a asp-action="Index">Back to List</a>
-</div>
+
+
