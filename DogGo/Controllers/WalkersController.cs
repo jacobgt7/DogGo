@@ -1,4 +1,5 @@
 ﻿using DogGo.Models;
+using DogGo.Models.ViewModels;
 using DogGo.Repositories;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -9,11 +10,13 @@ namespace DogGo.Controllers
     public class WalkersController : Controller
     {
         private readonly IWalkerRepository _walkerRepo;
+        private readonly IWalkRepository _walkRepo;
 
         // ASP.NET will give us an instance of our Walker Repository. This is called "Dependency Injection"
-        public WalkersController(IWalkerRepository walkerRepository)
+        public WalkersController(IWalkerRepository walkerRepository, IWalkRepository walkRepo)
         {
             _walkerRepo = walkerRepository;
+            _walkRepo = walkRepo;
         }
 
         // GET: WalkersController
@@ -30,13 +33,22 @@ namespace DogGo.Controllers
         public ActionResult Details(int id)
         {
             Walker walker = _walkerRepo.GetWalkerById(id);
+            List<Walk> allWalks = _walkRepo.GetWalksByWalkerId(id);
+            List<Walk> recentWalks = _walkRepo.GetRecentWalksByWalkerId(id);
 
             if (walker == null)
             {
                 return NotFound();
             }
 
-            return View(walker);
+            WalkerProfileViewModel vm = new WalkerProfileViewModel
+            {
+                Walker = walker,
+                AllWalks = allWalks,
+                RecentWalks = recentWalks
+            };
+
+            return View(vm);
         }
 
         // GET: WalkersController/Create
