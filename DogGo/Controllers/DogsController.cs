@@ -5,24 +5,31 @@ using System.Collections.Generic;
 using DogGo.Models;
 using System;
 using System.Security.Cryptography;
+using System.Security.Claims;
+using Microsoft.AspNetCore.Authorization;
 
 namespace DogGo.Controllers
 {
     public class DogsController : Controller
     {
-        private readonly IDogRepository _dogRepository;
+        private readonly IDogRepository _dogRepo;
 
         public DogsController(IDogRepository dogRepo)
         {
-            _dogRepository = dogRepo;
+            _dogRepo = dogRepo;
         }
 
+        [Authorize]
         public ActionResult Index()
         {
-            List<Dog> dogs = _dogRepository.GetAllDogs();
+            int ownerId = GetCurrentUserId();
+
+            List<Dog> dogs = _dogRepo.GetDogsByOwnerId(ownerId);
+
             return View(dogs);
         }
 
+        [Authorize]
         public ActionResult Create()
         {
             return View();
@@ -34,7 +41,8 @@ namespace DogGo.Controllers
         {
             try
             {
-                _dogRepository.AddDog(dog);
+                dog.OwnerId = GetCurrentUserId();
+                _dogRepo.AddDog(dog);
                 return RedirectToAction("Index");
             }
             catch (Exception ex)
@@ -45,7 +53,7 @@ namespace DogGo.Controllers
 
         public ActionResult Edit(int id)
         {
-            Dog dog = _dogRepository.GetDogById(id);
+            Dog dog = _dogRepo.GetDogById(id);
             
             if (dog == null)
             {
@@ -61,7 +69,7 @@ namespace DogGo.Controllers
         {
             try
             {
-                _dogRepository.UpdateDog(dog);
+                _dogRepo.UpdateDog(dog);
                 return RedirectToAction("Index");
             }
             catch (Exception ex)
@@ -72,7 +80,7 @@ namespace DogGo.Controllers
 
         public ActionResult Delete(int id)
         {
-            Dog dog = _dogRepository.GetDogById(id);
+            Dog dog = _dogRepo.GetDogById(id);
 
             return View(dog);
         }
@@ -83,13 +91,19 @@ namespace DogGo.Controllers
         {
             try
             {
-                _dogRepository.DeleteDog(id);
+                _dogRepo.DeleteDog(id);
                 return RedirectToAction("Index");
             }
             catch (Exception ex)
             {
                 return View(dog);
             }
+        }
+
+        private int GetCurrentUserId()
+        {
+            string id = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            return int.Parse(id);
         }
     }
 }
